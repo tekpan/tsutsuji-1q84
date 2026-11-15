@@ -1,0 +1,47 @@
+name: Publish HTML report release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '1Q84_L1_grammar_examples.html'
+      - '.github/workflows/publish-report.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-html-report
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out published report
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Publish downloadable HTML
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          report_tag="report-${GITHUB_SHA:0:12}"
+          report_file="1Q84_L1_grammar_examples.html"
+          test -s "$report_file"
+          if gh release view "$report_tag" >/dev/null 2>&1; then
+            gh release upload "$report_tag" "$report_file" --clobber
+          else
+            gh release create "$report_tag" "$report_file" \
+              --target "$GITHUB_SHA" \
+              --title "1Q84 L1 grammar report" \
+              --notes-file .github/release-notes.md \
+              --latest
+          fi
+          gh release view "$report_tag" --json url --jq .url >> "$GITHUB_STEP_SUMMARY"

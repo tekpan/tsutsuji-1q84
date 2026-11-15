@@ -2,7 +2,7 @@
 
 An offline, searchable HTML concordance of all **341 L1 expression families** in the Tsutsuji Japanese functional-expression dictionary, with up to ten distinct example sentences per family from Haruki Murakami's *1Q84*, BOOK1–BOOK3.
 
-Download [the HTML report](1Q84_L1_grammar_examples.html) and open it in a browser. It includes a grammar index, search, example-count filters, expandable entries, highlighted matches, and book/chapter/paragraph references. No server or internet connection is needed to read it.
+Download [the HTML report from the latest release](https://github.com/tekpan/tsutsuji-1q84/releases/latest/download/1Q84_L1_grammar_examples.html) and open it in a browser. You can also browse the [release page](https://github.com/tekpan/tsutsuji-1q84/releases/latest). It includes a grammar index, search, example-count filters, expandable entries, highlighted matches, and book/chapter/paragraph references. No server or internet connection is needed to read it.
 
 L1 is a layer of the dictionary's expression hierarchy, not a proficiency level. The report searches each L1 family through its registered L9 spellings and grammatical variants as well as its L1 base expression.
 
@@ -15,6 +15,8 @@ L1 is a layer of the dictionary's expression hierarchy, not a proficiency level.
 | `novel_report_template.html` | HTML, CSS, and browser-side search/filter interface |
 | `requirements.txt` | Python dependencies |
 | `.gitignore` | Excludes source books, dictionary files, and intermediate data |
+| `.github/workflows/publish-report.yml` | Publishes the HTML as a release asset when the report changes |
+| `.github/release-notes.md` | Description attached to report releases |
 
 The source EPUB, Tsutsuji XML/database, original L1–L9 lists, and intermediate `matches.json` are **not included**. The report necessarily includes its selected novel excerpts and dictionary-derived labels.
 
