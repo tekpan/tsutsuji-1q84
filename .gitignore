@@ -1,0 +1,24 @@
+# Private input material and original dictionary distributions
+data/
+*.epub
+*.mobi
+*.azw
+*.azw3
+*.db
+*.sqlite
+*.sqlite3
+tsutsuji*.xml
+tsutsuji*.csv
+L[1-9].list
+L[1-9].csv
+className*
+connectID*
+*.xsd
+
+# Intermediate matching data and local Python environments
+matches.json
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.DS_Store
