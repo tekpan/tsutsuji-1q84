@@ -1,10 +1,10 @@
 # Japanese grammar examples in *1Q84*
 
-An offline, searchable HTML concordance of all **341 L1 expression families** in the Tsutsuji Japanese functional-expression dictionary, with up to ten distinct example sentences per family from Haruki Murakami's *1Q84*, BOOK1–BOOK3.
+A searchable [HTML](https://tekpan.github.io/tsutsuji-1q84/) concordance of all **341 L1 expression families** in [日本語機能表現辞書「つつじ」](https://sites.google.com/edu.teu.ac.jp/cl-lab/研究/言語資源/日本語機能表現辞書つつじ), with up to ten distinct example sentences per family from Haruki Murakami's *1Q84*, BOOK1–BOOK3.
 
-Download [the HTML report from the latest release](https://github.com/tekpan/tsutsuji-1q84/releases/latest/download/1Q84_L1_grammar_examples.html) and open it in a browser. You can also browse the [release page](https://github.com/tekpan/tsutsuji-1q84/releases/latest). It includes a grammar index, search, example-count filters, expandable entries, highlighted matches, and book/chapter/paragraph references. No server or internet connection is needed to read it.
+It includes a grammar index, search, example-count filters, expandable entries, highlighted matches, and book/chapter/paragraph references.
 
-L1 is a layer of the dictionary's expression hierarchy, not a proficiency level. The report searches each L1 family through its registered L9 spellings and grammatical variants as well as its L1 base expression.
+L1 is the top layer of つつじ's hierarchy, which classifies all Japanese 機能表現 into 341 families. If you consider different forms as distinct 機能表現, then you get finer classification as L2 to L9. It has 16801 items in the L9 list. This repo searches each L1 family through its registered L9 spellings and grammatical variants in the novel *1Q84*.
 
 ## Contents
 
