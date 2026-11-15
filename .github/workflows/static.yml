@@ -1,46 +1,94 @@
-# Simple workflow for deploying static content to GitHub Pages
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
+    branches: [main]
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Prepare website
+        shell: bash
         run: |
+          set -euo pipefail
           mkdir -p _site
           cp 1Q84_L1_grammar_examples.html _site/index.html
+
       - name: Upload artifact
+        id: site
         uses: actions/upload-pages-artifact@v4
         with:
           path: _site
+
+      # Use the upload's exact ID: artifact-name discovery returned no results
+      # even though GitHub confirmed that the github-pages upload succeeded.
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/github-script@v8
+        env:
+          PAGES_ARTIFACT_ID: ${{ steps.site.outputs.artifact_id }}
+        with:
+          script: |
+            const artifactId = Number(process.env.PAGES_ARTIFACT_ID);
+            if (!Number.isSafeInteger(artifactId) || artifactId <= 0) {
+              throw new Error('The upload did not return a valid Pages artifact ID');
+            }
+            const idToken = await core.getIDToken();
+            const { data: deployment } = await github.request(
+              'POST /repos/{owner}/{repo}/pages/deployments',
+              {
+                ...context.repo,
+                artifact_id: artifactId,
+                pages_build_version: context.sha,
+                oidc_token: idToken
+              }
+            );
+            const deploymentId = deployment.id || deployment.status_url?.split('/').pop();
+            if (!deploymentId) throw new Error('Pages did not return a deployment ID');
+            const pageUrl = deployment.page_url;
+            if (pageUrl) core.setOutput('page_url', pageUrl);
+            core.info('Created Pages deployment ' + deploymentId);
+            const failures = new Set([
+              'deployment_failed', 'deployment_content_failed',
+              'deployment_cancelled', 'deployment_lost'
+            ]);
+            for (let attempt = 0; attempt < 90; attempt++) {
+              const { data: state } = await github.request(
+                'GET /repos/{owner}/{repo}/pages/deployments/{deployment_id}',
+                { ...context.repo, deployment_id: deploymentId }
+              );
+              core.info('Pages deployment status: ' + state.status);
+              if (state.status === 'succeed') {
+                await core.summary.addHeading('Report published')
+                  .addLink('Open the grammar report', pageUrl).write();
+                return;
+              }
+              if (failures.has(state.status)) {
+                throw new Error('Pages deployment failed: ' + state.status);
+              }
+              await new Promise(resolve => setTimeout(resolve, 5000));
+            }
+            throw new Error('Timed out waiting for the Pages deployment');
